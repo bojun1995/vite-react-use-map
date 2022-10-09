@@ -1,5 +1,5 @@
 import React from 'react'
-import csvObj from './car.csv'
+import csvFile from './assets/car.csv?raw'
 
 class MapComp extends React.Component {
   render() {
@@ -27,21 +27,6 @@ class MapComp extends React.Component {
       map: map,
     })
 
-    const data = [
-      {
-        geometry: {
-          type: 'LineString',
-          coordinates: [],
-        },
-      },
-      {
-        geometry: {
-          type: 'LineString',
-          coordinates: [],
-        },
-      },
-    ]
-
     const carlineLayer = new mapvgl.CarLineLayer({
       url: '/car.gltf',
       autoPlay: true,
@@ -49,10 +34,11 @@ class MapComp extends React.Component {
       scale: 100,
     })
 
-    setTimeout(() => {
-      view.addLayer(carlineLayer)
-      carlineLayer.setData(data)
-    }, 500)
+    const dataSet = mapv.csv.getDataSet(csvFile)
+    const data = dataSet.get().slice(0, 80)
+
+    view.addLayer(carlineLayer)
+    carlineLayer.setData(data)
 
     map.setDefaultCursor('default')
   }
