@@ -7,7 +7,7 @@ class MapComp extends React.Component {
   }
   componentDidMount() {
     const map = initMap({
-      tilt: 60,
+      tilt: 45,
       heading: 0,
       // TODO 地图中心位置
       center: [118.73933, 31.99809],
@@ -31,8 +31,15 @@ class MapComp extends React.Component {
     const carlineLayer = new mapvgl.CarLineLayer({
       url: '/car.gltf',
       autoPlay: true,
-      step: 0.2,
+      step: 0.3,
       scale: 100,
+    })
+    const lineLayer = new mapvgl.LineTripLayer({
+      color: 'rgb(0, 255, 255)',
+      step: 0.3,
+      trailLength: 100,
+      startTime: 0,
+      endTime: 100,
     })
 
     // data template
@@ -52,26 +59,31 @@ class MapComp extends React.Component {
     //   },
     // ]
 
-    let data = []
+    let allLineData = []
     const dataSet = mapv.csv.getDataSet(csvFile)
-    const car = {
+    const carLineData = {
       geometry: {
         type: 'LineString',
         coordinates: [],
       },
     }
     dataSet._data.some((row, idx) => {
-      if (idx < 100)  {
-        // TODO 字段名
-        car.geometry.coordinates.push([Number(row.pm2d5), Number(row.lon)])
+      // TODO 字段名有错位
+      // if (idx == 0) {
+      //   map.setCenter(new BMapGL.Point(Number(row.pm2d5), Number(row.lon)))
+      // }
+      if (idx < 1000) {
+        carLineData.geometry.coordinates.push([Number(row.pm2d5), Number(row.lon)])
       } else {
         return true
       }
     })
-    data = [car]
+    allLineData = [carLineData]
 
     view.addLayer(carlineLayer)
-    carlineLayer.setData(data)
+    carlineLayer.setData(allLineData)
+    view.addLayer(lineLayer)
+    lineLayer.setData(allLineData)
 
     map.setDefaultCursor('default')
   }
